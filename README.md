@@ -33,9 +33,15 @@ sudo apt-get install libgstreamer1.0-0 liborc-0.4-0 gir1.2-gst-plugins-base-1.0 
 
 Then I wrapped the video conversion command into a small script, convert_to_avi.sh. For example, the following command will convert images (with the name imageXXXX.jpg) in the specified location to an AVI file with the specified framerate. Seems to work well.
 
-`convert_to_avi.sh <location> <framerate>`
+`./convert_to_avi.sh <location> <framerate>`
 
-## Run on boot
+## Running
+
+To run the command line application:
+
+`./timelapse.py -t <time between pictures, seconds> -d <duration, minutes> -o <output location>`
+
+Also, the `run_timelapse.sh` script kicks stuff off and then runs the video converter afterwards.
 
 To run on boot:
 
@@ -44,6 +50,10 @@ To run on boot:
 Then enter something like this:
 
 `@reboot /home/pi/raspilapse/run_timelapse.sh >> /home/pi/raspilapse/log.txt`
+
+## Download Videos
+
+There's a "host" folder that contains a few scripts to rsync some data from my raspberry pi to my host PC.
 
 ## Edits?
 
