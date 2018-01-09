@@ -1,0 +1,5 @@
+arrow==0.12.0
+backports.functools-lru-cache==1.4
+numpy==1.12.1
+picamera==1.13
+python-dateutil==2.6.1
