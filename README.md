@@ -49,7 +49,7 @@ To run on boot:
 
 Then enter something like this:
 
-`@reboot /home/pi/raspilapse/run_timelapse.sh >> /home/pi/raspilapse/log.txt`
+`@reboot /home/pi/raspilapse/run_timelapse.sh &>> /home/pi/raspilapse/log.txt`
 
 ## Download Videos
 
