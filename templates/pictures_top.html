@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+   <title>Picture Folders</title>
+</head>
+
+<body>
+   <h1>Picture Folders</h1>
+
+   {% for pic in pictures %}
+   {{pic}}
+   <ul>
+     <li>Count:</li>
+     <li>Size:</li>
+     <li>Convert</li>
+     <li>Delete</li>
+   </ul>
+   {% endfor %}
+
+</body>
+</html>
