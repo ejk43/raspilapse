@@ -114,7 +114,7 @@ def hello():
     now = datetime.datetime.now()
     timeString = now.strftime("%Y-%m-%d %H:%M")
     if lapseobj.running:
-        statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(lapseobj.stop_datetime - datetime.datetime.now()))
+        statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(datetime.datetime.now() - lapseobj.stop_datetime))
     else:
         statusString = "Idle"
     templateData = {
