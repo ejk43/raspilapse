@@ -17,37 +17,94 @@ import argparse
 import os
 import arrow
 
+def convert_to_timedelta(time_val):
+    """
+    http://code.activestate.com/recipes/577894-convert-strings-like-5d-and-60s-to-timedelta-objec/
+    Given a *time_val* (string) such as '5d', returns a timedelta object
+    representing the given value (e.g. timedelta(days=5)).  Accepts the
+    following '<num><char>' formats:
+    
+    =========   ======= ===================
+    Character   Meaning Example
+    =========   ======= ===================
+    s           Seconds '60s' -> 60 Seconds
+    m           Minutes '5m'  -> 5 Minutes
+    h           Hours   '24h' -> 24 Hours
+    d           Days    '7d'  -> 7 Days
+    =========   ======= ===================
+    
+    Examples::
+    
+        >>> convert_to_timedelta('7d')
+        datetime.timedelta(7)
+        >>> convert_to_timedelta('24h')
+        datetime.timedelta(1)
+        >>> convert_to_timedelta('60m')
+        datetime.timedelta(0, 3600)
+        >>> convert_to_timedelta('120s')
+        datetime.timedelta(0, 120)
+    """
+    num = int(time_val[:-1])
+    if time_val.endswith('s'):
+        return datetime.timedelta(seconds=num)
+    elif time_val.endswith('m'):
+        return datetime.timedelta(minutes=num)
+    elif time_val.endswith('h'):
+        return datetime.timedelta(hours=num)
+    elif time_val.endswith('d'):
+        return datetime.timedelta(days=num)
+
 class TimeLapse:
+    running = False
+    stopping = False
     interval_s = None
+    stop_datetime = None
+    destination = None
+    runthread = None
 
-    def run_timelapse(output, number, time_s):
-		camera = PiCamera()
-		#camera.resolution = (640, 480) # Use a 4:3 ratio to get full FOV
-		camera.resolution = (1280, 960) # Use a 4:3 ratio to get full FOV
-		camera.rotation = 180
+    def run_timelapse(self):
+        camera = PiCamera()
+        #camera.resolution = (640, 480) # Use a 4:3 ratio to get full FOV
+        camera.resolution = (1280, 960) # Use a 4:3 ratio to get full FOV
+        camera.rotation = 180
 
-		#camera.start_preview()
-		for ii in range(number):
-		  time.sleep(time_s)
-		  print("Recording image %04i" % ii)
-		  utc = arrow.utcnow()
-		  timestr = utc.to('US/Eastern').format('YYYY-MM-DD hh:mm:ss a')
-		  camera.annotate_text = timestr
+        self.running = True
+        while datetime.datetime.now() < self.stop_time and not self.stopping:
+            time.sleep(self.interval_s)
+            print("Recording image %04i" % ii)
+            utc = arrow.utcnow()
+            timestr = utc.to('US/Eastern').format('YYYY-MM-DD hh:mm:ss a')
+            camera.annotate_text = timestr
 
-		  # Capture it!
-		  camera.capture(os.path.join(output, "image%04i.jpg" % ii))
+            # Capture it!
+            camera.capture(os.path.join(self.destination, "image%04i.jpg" % ii))
+        self.running = False
+        self.stopping = False
 
-		#camera.stop_preview()
+    def start_timelapse(self, interval_s, duration_timedelta):
+        utc = arrow.utcnow()
+        timestr = utc.to('US/Eastern').format('YYYY-MM-DD_HH-mm-ss')
+        self.destination = os.path.join(appdir, "pictures", timestr)      
+        if not os.path.isdir(self.destination):
+            os.makedirs(self.destination)
+        print("Saving timelapse to folder: %s" % (self.destination))
 
+        self.stop_datetime = datetime.datetime.now() + duration_timedelta
+        print("Scheduling end time for: %s" % (self.stop_datetime))
 
-class ExternalProc:
-    running_recording = False
-    stop = False
-    def start_recording(self):
-        self.runthread = threading.Thread(target=timelapse.run)
+        self.interval_s = interval_s
+        print("Setting interval to:  %s seconds" % self.interval_s)
+
+        self.stopping = False
+        self.runthread = threading.Thread(target=self.run_timelapse)
         self.runthread.daemon = True
         self.runthread.start()
 
+    def stop_timelapse(self):
+        self.stopping = True
+
+
+lapseobj = TimeLapse()
 
 @app.route("/")
 def hello():
@@ -78,11 +135,6 @@ def pictures_top_page():
    print pictures
    return render_template('pictures_top.html', **templateData)
 
-#@app.route("/start")
-#def startapp():
-#   return render_template('pictures_top.html', **templateData)
-# App config.
-
 class StartForm(Form):
     name = TextField('Name:', validators=[validators.required()])
 
@@ -105,7 +157,9 @@ def start_entrypoint():
 
 @app.route("/start/<interval>/<time>")
 def start_app():
-    
+    duration_request = convert_to_timedelta(time)
+    lapseobj.start_timelapse(interval, duration_request)
+    return render_template('main.html', **templateData)
 
 @app.route('/videos/<filename>', methods=['GET', 'POST'])
 def download_video(filename):
