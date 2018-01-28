@@ -17,6 +17,7 @@ import datetime
 import argparse
 import os
 import arrow
+import threading
 
 def convert_to_timedelta(time_val):
     """
@@ -70,7 +71,7 @@ class TimeLapse:
         camera.rotation = 180
 
         self.running = True
-        while datetime.datetime.now() < self.stop_time and not self.stopping:
+        while datetime.datetime.now() < self.stop_datetime and not self.stopping:
             time.sleep(self.interval_s)
             print("Recording image %04i" % ii)
             utc = arrow.utcnow()
