@@ -127,10 +127,9 @@ class Conversion:
         pass
 
     def check_if_running(self):
-        if not proc:
+        if not self.proc:
             return False
-
-        poll = proc.poll()
+        poll = self.proc.poll()
         if poll is None:
             return True
         else:
