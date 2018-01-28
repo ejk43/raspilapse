@@ -6,11 +6,11 @@
 <body>
    <h1>Picture Folders</h1>
 
-   {% for pic in pictures %}
+   {% for pic, num in zip(pictures, counts)  %}
    {{pic}}
    <ul>
-     <li>Count:</li>
-     <li>Size:</li>
+     <li>Count: {{num}}</li>
+     <li>Size: ?</li>
      <li><a href="/convert/{{pic}}">Convert</a></li>
      <li>Delete</li>
    </ul>

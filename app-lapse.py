@@ -181,13 +181,16 @@ def videos_page():
 
 @app.route("/pictures")
 def pictures_top_page():
-   pictures = os.listdir("pictures")
-   pictures.sort()
-   templateData = {
-      'pictures' : pictures
-      }
-   print pictures
-   return render_template('pictures_top.html', **templateData)
+    picdir = os.path.join(appdir, "pictures")
+    pictures = os.listdir(picdir)
+    pictures.sort()
+    counts = [length(os.listdir(os.path.join(picdir,pic))) for pic in pictures]
+    templateData = {
+        'pictures' : pictures,
+        'counts' : counts
+    }
+    print pictures
+    return render_template('pictures_top.html', **templateData)
 
 class StartForm(Form):
     name = TextField('Name:', validators=[validators.required()])
