@@ -141,7 +141,7 @@ class Conversion:
             "name" : name,
             "infolder" : os.path.join(appdir, "pictures"),
             "outfolder" : os.path.join(appdir, "videos"),
-            "framerate", framerate
+            "framerate" : framerate
         }
         mycall = convert_avi_tmpl.format(**convert_params)
         print("Running conversion: %s" % mycall)
