@@ -13,11 +13,9 @@ sys.path.append(appdir)
 
 from picamera import PiCamera
 import time
-import datetime
-import argparse
-import os
 import arrow
 import threading
+import humanize
 
 def convert_to_timedelta(time_val):
     """
@@ -113,13 +111,18 @@ lapseobj = TimeLapse()
 
 @app.route("/")
 def hello():
-   now = datetime.datetime.now()
-   timeString = now.strftime("%Y-%m-%d %H:%M")
-   templateData = {
-      'title' : 'HELLO!',
-      'time': timeString
-      }
-   return render_template('main.html', **templateData)
+    now = datetime.datetime.now()
+    timeString = now.strftime("%Y-%m-%d %H:%M")
+    if lapseobj.running:
+        statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(lapseobj.stop_datetime - datetime.datetime.now()))
+    else:
+        statusString = "Idle"
+    templateData = {
+        'title' : 'HELLO!',
+        'time': timeString
+        'status' : statusString
+    }
+    return render_template('main.html', **templateData)
 
 @app.route("/videos")
 def videos_page():
