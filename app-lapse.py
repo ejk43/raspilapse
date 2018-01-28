@@ -119,7 +119,7 @@ def hello():
         statusString = "Idle"
     templateData = {
         'title' : 'HELLO!',
-        'time': timeString
+        'time': timeString,
         'status' : statusString
     }
     return render_template('main.html', **templateData)
