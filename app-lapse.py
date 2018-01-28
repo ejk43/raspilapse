@@ -160,7 +160,7 @@ def start_entrypoint():
 @app.route("/start/<interval>/<time>")
 def start_app(interval, time):
     duration_request = convert_to_timedelta(time)
-    lapseobj.start_timelapse(interval, duration_request)
+    lapseobj.start_timelapse(float(interval), duration_request)
     return render_template('main.html', **templateData)
 
 @app.route('/videos/<filename>', methods=['GET', 'POST'])
