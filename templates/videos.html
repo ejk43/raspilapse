@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<head>
+   <title>Videos</title>
+</head>
+
+<body>
+   <h1>List of Videos to Download</h1>
+
+   {% for vid in videos %}
+   <p><a href="/videos/{{vid}}">{{vid}}</a></p>
+   {% endfor %}
+
+</body>
+</html>
