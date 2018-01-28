@@ -161,6 +161,12 @@ def start_entrypoint():
 def start_app(interval, time):
     duration_request = convert_to_timedelta(time)
     lapseobj.start_timelapse(float(interval), duration_request)
+    now = datetime.datetime.now()
+    timeString = now.strftime("%Y-%m-%d %H:%M")
+    templateData = {
+        'title' : 'HELLO!',
+        'time': timeString
+    }
     return render_template('main.html', **templateData)
 
 @app.route('/videos/<filename>', methods=['GET', 'POST'])
