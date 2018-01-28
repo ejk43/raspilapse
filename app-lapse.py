@@ -63,6 +63,7 @@ class TimeLapse:
     stop_datetime = None
     destination = None
     runthread = None
+    ii = None
 
     def run_timelapse(self):
         camera = PiCamera()
@@ -71,15 +72,17 @@ class TimeLapse:
         camera.rotation = 180
 
         self.running = True
+        self.ii = 0
         while datetime.datetime.now() < self.stop_datetime and not self.stopping:
             time.sleep(self.interval_s)
-            print("Recording image %04i" % ii)
+            print("Recording image %04i" % self.ii)
             utc = arrow.utcnow()
             timestr = utc.to('US/Eastern').format('YYYY-MM-DD hh:mm:ss a')
             camera.annotate_text = timestr
 
             # Capture it!
-            camera.capture(os.path.join(self.destination, "image%04i.jpg" % ii))
+            camera.capture(os.path.join(self.destination, "image%04i.jpg" % self.ii))
+            self.ii = self.ii + 1
         self.running = False
         self.stopping = False
 
