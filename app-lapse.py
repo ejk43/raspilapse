@@ -16,6 +16,11 @@ import time
 import arrow
 import threading
 import humanize
+import subprocess
+
+framerate = 10
+
+convert_avi_tmpl = """gst-launch-1.0 multifilesrc location={infolder}/{name}/image%04d.jpg index=1 caps="image/jpeg,framerate={framerate}/1" ! jpegdec ! omxh264enc ! avimux ! filesink location={outfolder}/{name}.avi"""
 
 def convert_to_timedelta(time_val):
     """
@@ -107,21 +112,62 @@ class TimeLapse:
     def stop_timelapse(self):
         self.stopping = True
 
+    def get_status(self):
+        if self.running:
+            statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(now - self.stop_datetime))
+        else:
+            statusString = "Idle"
+        return statusString
+
+class Conversion:
+    proc = None
+    target = None
+
+    def __init__(self):
+        pass
+
+    def check_if_running(self):
+        if not proc:
+            return False
+
+        poll = proc.poll()
+        if poll is None:
+            return True
+        else:
+            return False
+
+    def start_conversion(self, name):
+        convert_params = {
+            "name" : name,
+            "infolder" : os.path.join(appdir, "pictures"),
+            "outfolder" : os.path.join(appdir, "videos"),
+            "framerate", framerate
+        }
+        mycall = convert_avi_tmpl.format(**convert_params)
+        print("Running conversion: %s" % mycall)
+
+        self.target = name
+        self.proc = subprocess.Popen(mycall, shell=True)
+
+    def get_status(self):
+        if self.check_if_running():
+            statusString = "Converting %s" % (self.target)
+        else:
+            statusString = "Idle"
+        return statusString
 
 lapseobj = TimeLapse()
+convertobj = Conversion()
 
 @app.route("/")
 def hello():
     now = datetime.datetime.now()
     timeString = now.strftime("%Y-%m-%d %H:%M")
-    if lapseobj.running:
-        statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(now - lapseobj.stop_datetime))
-    else:
-        statusString = "Idle"
     templateData = {
         'title' : 'HELLO!',
         'time': timeString,
-        'status' : statusString
+        'app_status' : lapseobj.get_status(),
+        'convert_status' : convertobj.get_status(),
     }
     return render_template('main.html', **templateData)
 
@@ -175,11 +221,31 @@ def start_app(interval, time):
         duration_request = convert_to_timedelta(time)
         lapseobj.start_timelapse(float(interval), duration_request)
 
-    statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(now - lapseobj.stop_datetime))
     templateData = {
         'title' : titleString,
         'time': timeString,
-        'status' : statusString
+        'app_status' : lapseobj.get_status(),
+        'convert_status' : convertobj.get_status(),
+    }
+    return render_template('main.html', **templateData)
+
+@app.route("/convert/<name>")
+def convert_app(name):
+    pictures = os.listdir("pictures")
+    if not name in pictures:
+        titleString = "Conversion Failed! No pictures named %s" % (name) 
+    else:
+        if convertobj.check_if_running():
+            titleString = "Conversion Failed! Already running"
+        else:
+            titleString = "Conversion Started!"
+            convertobj.start_conversion(name)
+
+    templateData = {
+        'title' : titleString,
+        'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        'app_status' : lapseobj.get_status(),
+        'convert_status' : convertobj.get_status(),
     }
     return render_template('main.html', **templateData)
 
