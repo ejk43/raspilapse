@@ -3,6 +3,7 @@ from flask import flash, request
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 import datetime
 import os
+import sys
 from glob import glob
 
 app = Flask(__name__)
@@ -156,7 +157,7 @@ def start_entrypoint():
     return render_template('start.html', form=form)
 
 @app.route("/start/<interval>/<time>")
-def start_app():
+def start_app(interval, time):
     duration_request = convert_to_timedelta(time)
     lapseobj.start_timelapse(interval, duration_request)
     return render_template('main.html', **templateData)
