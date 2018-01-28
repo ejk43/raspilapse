@@ -114,7 +114,7 @@ def hello():
     now = datetime.datetime.now()
     timeString = now.strftime("%Y-%m-%d %H:%M")
     if lapseobj.running:
-        statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(datetime.datetime.now() - lapseobj.stop_datetime))
+        statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(now - lapseobj.stop_datetime))
     else:
         statusString = "Idle"
     templateData = {
@@ -165,13 +165,20 @@ def start_entrypoint():
 
 @app.route("/start/<interval>/<time>")
 def start_app(interval, time):
-    duration_request = convert_to_timedelta(time)
-    lapseobj.start_timelapse(float(interval), duration_request)
     now = datetime.datetime.now()
     timeString = now.strftime("%Y-%m-%d %H:%M")
+    if lapseobj.running:
+        titleString = "Start Failed! Already running"
+    else:
+        titleString = "Start Succeeded!"
+        duration_request = convert_to_timedelta(time)
+        lapseobj.start_timelapse(float(interval), duration_request)
+
+    statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(now - lapseobj.stop_datetime))
     templateData = {
-        'title' : 'HELLO!',
-        'time': timeString
+        'title' : titleString,
+        'time': timeString,
+        'status' : statusString
     }
     return render_template('main.html', **templateData)
 
