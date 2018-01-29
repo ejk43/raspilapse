@@ -184,10 +184,13 @@ def pictures_top_page():
     picdir = os.path.join(appdir, "pictures")
     pictures = os.listdir(picdir)
     pictures.sort()
-    counts = [len(os.listdir(os.path.join(picdir,pic))) for pic in pictures]
+    dict_pics = []
+    for pic in pictures:
+        count = len(os.listdir(os.path.join(picdir,pic)))
+        temp = {'name' : pic, 'count': count}
+        dict_pics.append(temp)
     templateData = {
-        'pictures' : pictures,
-        'counts' : counts
+        'pictures' : dict_pics
     }
     print pictures
     return render_template('pictures_top.html', **templateData)
