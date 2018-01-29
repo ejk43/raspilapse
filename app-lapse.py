@@ -59,6 +59,15 @@ def convert_to_timedelta(time_val):
     elif time_val.endswith('d'):
         return datetime.timedelta(days=num)
 
+def get_size(start_path = '.'):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
+
 class TimeLapse:
     running = False
     stopping = False
@@ -186,8 +195,10 @@ def pictures_top_page():
     pictures.sort()
     dict_pics = []
     for pic in pictures:
-        count = len(os.listdir(os.path.join(picdir,pic)))
-        temp = {'name' : pic, 'count': count}
+        currdir = os.path.join(picdir,pic)
+        size = get_size(currdir)
+        count = len(os.listdir(currdir))
+        temp = {'name' : pic, 'count': count, 'size' : size}
         dict_pics.append(temp)
     templateData = {
         'pictures' : dict_pics

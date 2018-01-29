@@ -7,10 +7,10 @@
    <h1>Picture Folders</h1>
 
    {% for pic in pictures %}
-   {{pic}}
+   {{pic['name']}}
    <ul>
      <li>Count: {{pic['count']}}</li>
-     <li>Size: ?</li>
+     <li>Size: {{pic['size']}}</li>
      <li><a href="/convert/{{pic['name']}}">Convert</a></li>
      <li>Delete</li>
    </ul>
