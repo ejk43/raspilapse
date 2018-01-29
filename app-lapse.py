@@ -196,14 +196,14 @@ def pictures_top_page():
     dict_pics = []
     for pic in pictures:
         currdir = os.path.join(picdir,pic)
-        size = get_size(currdir)
+        size = "%i kB" % (get_size(currdir)/1024)
         count = len(os.listdir(currdir))
         temp = {'name' : pic, 'count': count, 'size' : size}
         dict_pics.append(temp)
     templateData = {
         'pictures' : dict_pics
     }
-    print pictures
+    # print pictures
     return render_template('pictures_top.html', **templateData)
 
 class StartForm(Form):
