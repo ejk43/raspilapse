@@ -196,7 +196,7 @@ def pictures_top_page():
     dict_pics = []
     for pic in pictures:
         currdir = os.path.join(picdir,pic)
-        size = "%i MB" % (get_size(currdir)/2048)
+        size = "%i MB" % (get_size(currdir)/1024/1024)
         count = len(os.listdir(currdir))
         temp = {'name' : pic, 'count': count, 'size' : size}
         dict_pics.append(temp)
