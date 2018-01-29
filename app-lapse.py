@@ -123,7 +123,7 @@ class TimeLapse:
 
     def get_status(self):
         if self.running:
-            statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(now - self.stop_datetime))
+            statusString = "Running... (Stop time = %s)" % (humanize.naturaltime(datetime.datetime.now() - self.stop_datetime))
         else:
             statusString = "Idle"
         return statusString
@@ -247,7 +247,8 @@ def start_app(interval, time):
 
 @app.route("/convert/<name>")
 def convert_app(name):
-    pictures = os.listdir("pictures")
+    picdir = os.path.join(appdir, "pictures")
+    pictures = os.listdir(picdir)
     if not name in pictures:
         titleString = "Conversion Failed! No pictures named %s" % (name) 
     else:
