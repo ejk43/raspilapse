@@ -6,12 +6,12 @@
 <body>
    <h1>Picture Folders</h1>
 
-   {% for pic, num in zip(pictures, counts)  %}
+   {% for pic in pictures %}
    {{pic}}
    <ul>
-     <li>Count: {{num}}</li>
+     <li>Count: {{pic['count']}}</li>
      <li>Size: ?</li>
-     <li><a href="/convert/{{pic}}">Convert</a></li>
+     <li><a href="/convert/{{pic['name']}}">Convert</a></li>
      <li>Delete</li>
    </ul>
    {% endfor %}
